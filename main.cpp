@@ -76,12 +76,46 @@ void showBooks(const vector<Book> &books){
         return;
     }
     for (int i=0; i < books.size(); i++){
-        cout << books[i].getId() << endl;
-        cout << books[i].getTittle() << endl;
-        cout << books[i].getAuthor() << endl;
-        cout << books[i].getStatus() << endl;
+        cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << endl;
     }
     
+}
+
+void findBook(const vector<Book> &books){
+    if (books.empty()){
+        cout << "There are no books yet" << endl;
+        return;
+    }
+    string find;
+    cout << "Write the tittle or the ID of the book you want to find: " << endl;
+    if (cin.peek() == '\n'){
+        cin.ignore();
+    }
+    getline(cin, find);
+    for(int i = 0; i < books.size(); i++){
+        if (find == books[i].getTittle()){
+            cout << "Book found! by Tittle" << endl;
+            cout << "Tittle: " << books[i].getTittle() << " Author: " << books[i].getAuthor() << " Status: " << books[i].getStatus() << endl;
+            return;
+        }
+        else{
+            try
+            {
+                int id = stoi(find);
+                for(int i = 0; i < books.size(); i++){
+                    if(id == books[i].getId()){
+                        cout << "Book found! by ID" << endl;
+                        cout << "Tittle: " << books[i].getTittle() << " Author: " << books[i].getAuthor() << " Status: " << books[i].getStatus() << endl;
+                        return;
+                    }
+                }
+            }
+            catch(invalid_argument&)
+            {
+                cout << "No book found with this title or ID." << endl;
+            }
+        }
+    }
 }
 
 int main(){
@@ -117,7 +151,7 @@ int main(){
                 showBooks(books);
                 break;
             case 3:
-                //findBook();
+                findBook(books);
                 break;
             case 4:
                 //removeBook();
