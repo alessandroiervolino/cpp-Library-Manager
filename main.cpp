@@ -70,13 +70,15 @@ void addBook(vector<Book> &books){
     books.push_back(newBook);
 }
 
-void showBooks(const vector<Book> &books){
+void showBooks(const vector<Book> &books, string filter = "all"){
     if (books.empty()){
         cout << "There are no books yet" << endl;
         return;
     }
     for (int i=0; i < books.size(); i++){
+        if (filter == "all" || books[i].getStatus() == filter){
         cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << endl;
+        }
     }
     
 }
@@ -118,6 +120,85 @@ void findBook(const vector<Book> &books){
     }
 }
 
+void removeBook(vector<Book> &books){
+    if (books.empty()){
+        cout << "There are no books yet" << endl;
+        return;
+    }
+    int remove;
+    showBooks(books);
+    cout << "Which book do you want to remove from the library? (Write the ID):" << endl;
+    cout << "0. I don't want to erase anything" << endl;
+    cin >> remove;
+    bool found = false;
+    if (remove == 0){
+            return;
+    }
+    for (int i = 0; i < books.size(); i++){
+        if (remove == books[i].getId()){
+            books.erase(books.begin() + i);
+            found = true;
+            cout << "Book removed!" << endl;
+            return;
+        }
+    }
+    if (!found){
+        cout << "No book with that ID exists." << endl;
+        return;
+    }
+}
+
+void lendBook(vector<Book> &books){
+    cout << "Which book do you want to lend? (write the ID): " << endl;
+    showBooks(books, "aviable");//quiero mostrar solo los que estan en status == "aviable"
+    int lend;
+    cin >> lend;
+    bool found = false;
+    for (int i = 0; i < books.size(); i++){
+        if (lend == books[i].getId() && books[i].getStatus() == "aviable"){
+            books[i].setStatus("unaviable");
+            cout << "Book lended!" << endl;
+            return;            
+        }
+        else {
+            cout << "This book is unaviable" << endl;
+            return;
+        }
+        
+    }
+    if (!found){
+        cout << "No book with that ID exists." << endl;
+        return;
+    } 
+}
+
+void returnBook(vector<Book> &books){
+    cout << "Which book do you want to return? (write the ID): " << endl;
+    showBooks(books, "unaviable");
+    int ret;
+    cin >> ret;
+    bool found = false;
+    for (int i = 0; i < books.size(); i++){
+        if (books[i].getId() == ret){
+            found = true;
+            if (books[i].getStatus() == "aviable"){
+                cout << "This book is already avialble" << endl;
+                return;
+            }
+            else{
+                books[i].setStatus("aviable");
+                cout << "Book returned!" << endl;
+                return;
+            }
+
+        }
+    }
+    if (!found){
+        cout << "No book with that ID exists." << endl;
+        return;
+    }
+}
+
 int main(){
     vector<Book> books;
     int running = 1;
@@ -154,13 +235,13 @@ int main(){
                 findBook(books);
                 break;
             case 4:
-                //removeBook();
+                removeBook(books);
                 break;
             case 5:
-                //lendBook();
+                lendBook(books);
                 break;
             case 6:
-                //returnBook();
+                returnBook(books);
                 break;
             case 7:
                 //registerUser();
@@ -181,3 +262,7 @@ int main(){
     return 0;
     
 }
+//POR HACER:
+//falta poner la opcion 0 en algunas funciones
+//seguir con las ultimas funciones por crear
+//evitar crash si el usuario no pone numeros en las funciones
