@@ -190,7 +190,6 @@ void returnBook(vector<Book> &books){
                 cout << "Book returned!" << endl;
                 return;
             }
-
         }
     }
     if (!found){
@@ -260,7 +259,6 @@ int main(){
 
     }
     return 0;
-    
 }
 //POR HACER:
 //falta poner la opcion 0 en algunas funciones
