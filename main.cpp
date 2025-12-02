@@ -3,12 +3,11 @@
 #include <limits>
 #include <vector>
 
-
 using namespace std;
 
 class Book {
     private:
-        string tittle, author, status;
+        string tittle, author, status, user;
         int id;
         static int nextId;
 
@@ -17,14 +16,28 @@ class Book {
         void setTittle(string tittle);
         void setAuthor(string author);
         void setStatus(string status);   
+        void setUser(string user);
         string getTittle() const;
         string getAuthor() const;
         int getId() const;
         string getStatus() const;
-    
+        string getUser() const;
+};
+
+class User {
+    private:
+        string username;
+        int userId;
+        static int nextId;
+    public:
+        User(string _username): username(_username){userId = nextId ++;}
+        void setUsername(string username);
+        string getUsername() const;
+        int getId() const;
 };
 
 int Book::nextId = 1;
+int User::nextId = 1;
 
 void Book::setTittle(string _tittle){
     tittle = _tittle;
@@ -36,6 +49,14 @@ void Book::setAuthor(string _author){
 
 void Book::setStatus(string _status){
     status = _status;
+}
+
+void Book::setUser(string _user){
+    user = _user;
+}
+
+void User::setUsername(string _username){
+    username = _username;
 }
 
 string Book::getTittle() const{
@@ -54,7 +75,20 @@ string Book::getStatus() const{
     return status;
 }
 
+string Book::getUser() const{
+    return user;
+}
+
+string User::getUsername() const{
+    return username;
+}
+
+int User::getId() const{
+    return userId;
+}
+
 void addBook(vector<Book> &books){
+    system("cls");
     string t,a;
     cout << "Write the tittle of the new book" << endl;
     if (cin.peek() == '\n'){
@@ -68,22 +102,36 @@ void addBook(vector<Book> &books){
     getline(cin, a);
     Book newBook (t, a);
     books.push_back(newBook);
+    cout << "Book added!" << endl;
 }
 
 void showBooks(const vector<Book> &books, string filter = "all"){
+    system("cls");
     if (books.empty()){
         cout << "There are no books yet" << endl;
         return;
     }
     for (int i=0; i < books.size(); i++){
-        if (filter == "all" || books[i].getStatus() == filter){
-        cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << endl;
+        if (filter == "all"){
+            if (books[i].getStatus() == "unaviable"){
+                cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << "|" << "Borrowed by: " << books[i].getUser() << endl;    
+            }
+            if (books[i].getStatus() == "aviable"){
+                cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << endl;
+            }
+        }
+        if (filter == books[i].getStatus() && books[i].getStatus() == "unaviable"){
+            cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << "|" << "Borrowed by: " << books[i].getUser() << endl;    
+        }
+        if (filter == books[i].getStatus() && books[i].getStatus() == "aviable"){
+            cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << endl;
         }
     }
     
 }
 
 void findBook(const vector<Book> &books){
+    system("cls");
     if (books.empty()){
         cout << "There are no books yet" << endl;
         return;
@@ -97,7 +145,12 @@ void findBook(const vector<Book> &books){
     for(int i = 0; i < books.size(); i++){
         if (find == books[i].getTittle()){
             cout << "Book found! by Tittle" << endl;
-            cout << "Tittle: " << books[i].getTittle() << " Author: " << books[i].getAuthor() << " Status: " << books[i].getStatus() << endl;
+            if(books[i].getStatus() == "unaviable"){
+                cout << "ID: " << books[i].getId() << "|" << "Tittle: " << books[i].getTittle() << "|" << "Author: " << books[i].getAuthor() << "|" << "Status: " << books[i].getStatus() << "|" << "Borrowed by: " << books[i].getUser() << endl;    
+            }
+            if(books[i].getStatus() == "aviable"){
+                cout << "Tittle: " << books[i].getTittle() << " Author: " << books[i].getAuthor() << " Status: " << books[i].getStatus() << endl;
+            }
             return;
         }
         else{
@@ -121,6 +174,7 @@ void findBook(const vector<Book> &books){
 }
 
 void removeBook(vector<Book> &books){
+    system("cls");
     if (books.empty()){
         cout << "There are no books yet" << endl;
         return;
@@ -147,36 +201,102 @@ void removeBook(vector<Book> &books){
         return;
     }
 }
+void showUsers(const vector<User> &users){
+    system("cls");
+    if (users.empty()){
+        cout << "There are no users registered yet" << endl;
+        return;
+    }
+    for (int i = 0; i < users.size(); i++){
+        cout << "ID: " << users[i].getId() << "|" << "Username: " << users[i].getUsername() << endl;
+    }
+}
 
-void lendBook(vector<Book> &books){
-    cout << "Which book do you want to lend? (write the ID): " << endl;
+void lendBook(vector<Book> &books, vector<User> &users){
+    system("cls");
+    showUsers(users);
+    cout << "Which user is borrowing the book? (write the ID):" << endl;
+    int borrower_id;
+    bool found = false;
+    string borrower;
+    cin >> borrower_id;
+    for (int i = 0; i < users.size(); i++){
+        if (borrower_id == users[i].getId()){
+            found = true;
+            borrower = users[i].getUsername();
+        }
+    }
+    if (!found){
+        cout << "No user with that ID exists" << endl;
+    }
     showBooks(books, "aviable");//quiero mostrar solo los que estan en status == "aviable"
+    cout << "0. I don't want to borrow anything" << endl;
+    cout << "Which book do you want to borrow? (write the ID): " << endl;
     int lend;
     cin >> lend;
-    bool found = false;
+    while (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enter a valid ID please" << endl;
+        cin >> lend;
+    }
+    if (lend == 0){
+            return;
+    }
+    bool found1 = false;
     for (int i = 0; i < books.size(); i++){
         if (lend == books[i].getId() && books[i].getStatus() == "aviable"){
             books[i].setStatus("unaviable");
+            books[i].setUser(borrower);
             cout << "Book lended!" << endl;
+            found1 = true;
             return;            
         }
         else {
             cout << "This book is unaviable" << endl;
             return;
         }
-        
     }
-    if (!found){
+    if (!found1){
         cout << "No book with that ID exists." << endl;
         return;
     } 
 }
 
-void returnBook(vector<Book> &books){
+void returnBook(vector<Book> &books, const vector<User> users){
+    showUsers(users);
+    cout << "Which user is borrowing the book? (write the ID):" << endl;
+    int returner_id;
+    bool found1 = false;
+    string returner;
+    cin >> returner_id;
+    for (int i = 0; i < users.size(); i++){
+        if (returner_id == users[i].getId()){
+            found1 = true;
+            returner = users[i].getUsername();
+        }
+    }
+    if (!found1){
+        cout << "No user with that ID exists" << endl;
+    }
+    system("cls");
+    showBooks(books, "unaviable");//quiero mostrar los libros que tiene el usuario en estado de unaviable
+    cout << "0. I don't want to return anything" << endl;
     cout << "Which book do you want to return? (write the ID): " << endl;
-    showBooks(books, "unaviable");
     int ret;
     cin >> ret;
+    if (ret == 0){
+            return;
+    }
+    while (cin.fail()) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Enter a valid ID please" << endl;
+        cin >> ret;
+    }
+    if (ret == 0){
+            return;
+    }
     bool found = false;
     for (int i = 0; i < books.size(); i++){
         if (books[i].getId() == ret){
@@ -187,6 +307,7 @@ void returnBook(vector<Book> &books){
             }
             else{
                 books[i].setStatus("aviable");
+                books[i].setUser(returner);
                 cout << "Book returned!" << endl;
                 return;
             }
@@ -198,8 +319,30 @@ void returnBook(vector<Book> &books){
     }
 }
 
+void registerUser(vector<User> &users){
+    system("cls");
+    cout << "Creating new user..." << endl;
+    cout << "Please set a username" << endl;
+    string username;
+    cin >> username;
+    User newUser(username);
+    users.push_back(newUser);
+    cout << "User registered!" << endl;
+}
+
+
+
+void showUnaviable(vector<Book> &books){
+    showBooks(books, "unaviable");
+}
+
+void showAviable(vector<Book> &books){
+    showBooks(books, "aviable");
+}
+
 int main(){
     vector<Book> books;
+    vector<User> users;
     int running = 1;
     int n;
     while(running){
@@ -226,34 +369,56 @@ int main(){
         switch(n){
             case 1:
                 addBook(books);
+                system("pause");
+                system("cls");
                 break;
             case 2:
                 showBooks(books);
+                system("pause");
+                system("cls");
                 break;
             case 3:
                 findBook(books);
+                system("pause");
+                system("cls");
                 break;
             case 4:
                 removeBook(books);
+                system("pause");
+                system("cls");
                 break;
             case 5:
-                lendBook(books);
+                lendBook(books, users);
+                system("pause");
+                system("cls");
                 break;
             case 6:
-                returnBook(books);
+                returnBook(books, users);
+                system("pause");
+                system("cls");
                 break;
             case 7:
-                //registerUser();
+                registerUser(users);
+                system("pause");
+                system("cls");
                 break;
             case 8:
-                //showUsers();
+                showUsers(users);
+                system("pause");
+                system("cls");
                 break;
             case 9:
                 cout << "Exiting..." << endl;
                 return 0;
                 break;
+            case 10:
+                showUnaviable(books);
+                break;
+            case 11:
+                showAviable(books);
+                break;
             default:
-                cout << "wrong number " << endl;
+                cout << "This is not a valid option " << endl;
                 break;
         }
 
@@ -261,6 +426,4 @@ int main(){
     return 0;
 }
 //POR HACER:
-//falta poner la opcion 0 en algunas funciones
-//seguir con las ultimas funciones por crear
-//evitar crash si el usuario no pone numeros en las funciones
+//el returnBook() tiene que mostrar solo los libros que el usuario tiene 
