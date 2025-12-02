@@ -341,16 +341,6 @@ void registerUser(vector<User> &users){
     cout << "User registered!" << endl;
 }
 
-
-
-void showUnavailable(vector<Book> &books){
-    showBooks(books, "unavailable");
-}
-
-void showavailable(vector<Book> &books){
-    showBooks(books, "available");
-}
-
 int main(){
     vector<Book> books;
     vector<User> users;
@@ -422,12 +412,6 @@ int main(){
                 cout << "Exiting..." << endl;
                 return 0;
                 break;
-            case 10:
-                showUnavailable(books);
-                break;
-            case 11:
-                showavailable(books);
-                break;
             default:
                 cout << "This is not a valid option " << endl;
                 break;
@@ -436,5 +420,3 @@ int main(){
     }
     return 0;
 }
-//POR HACER:
-//el returnBook() tiene que mostrar solo los libros que el usuario tiene 
